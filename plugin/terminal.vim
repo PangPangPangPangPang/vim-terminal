@@ -8,6 +8,8 @@ let g:mx_terminal_buffer_number = 0
 let g:mx_called_toggle = 0
 let g:mx_is_terminal_open = 0
 
+let g:mx_terminal_default_height = 10
+
 function! MXTerminalToggle()
     if g:mx_is_terminal_open == 1
         call MXTerminalClose()
@@ -33,11 +35,16 @@ function! MXTerminalOpen()
     if g:mx_has_terminal == 0
         " Terminal init finished.
         let g:mx_has_terminal = 1
-        execute 'rightbelow terminal ++rows=10'
+        execute 'rightbelow terminal ++rows=' . g:mx_terminal_default_height
     else
-        exec 'rightbelow' . ' 10 ' . 'split'
+        exec 'rightbelow ' . g:mx_terminal_default_height . ' split'
         exec 'b ' . g:mx_terminal_buffer_number
     endif
+    call MXSetDefaultConfig()
+endfunction
+
+function! MXSetDefaultConfig()
+    exec 'set sfh'
 endfunction
 
 
