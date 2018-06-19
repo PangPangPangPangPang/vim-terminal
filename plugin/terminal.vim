@@ -1,11 +1,9 @@
-if exists('g:MXTerminalLoaded')
-  finish
+if exists('g:mx_terminal_loaded')
+  " finish
 end
-let g:MXTerminalLoaded = 1
+let g:mx_terminal_loaded = 1
 
-let g:mx_has_terminal = 0
 let g:mx_terminal_buffer_number = 0
-let g:mx_called_toggle = 0
 let g:mx_is_terminal_open = 0
 
 if !exists("g:mx_terminal_custom_height")
@@ -13,6 +11,11 @@ if !exists("g:mx_terminal_custom_height")
 endif
 
 function! MXTerminalToggle()
+    " Set mx_is_terminal_open state to 0 if default terminal is not exist.
+    if !bufexists(g:mx_terminal_buffer_number)
+        let g:mx_is_terminal_open = 0
+    endif
+
     if g:mx_is_terminal_open == 1
         call MXTerminalClose()
         let g:mx_is_terminal_open = 0
@@ -33,14 +36,17 @@ function! MXTerminalClose()
 endfunction
 
 function! MXTerminalOpen()
-    let g:mx_called_toggle = 1
-    if g:mx_has_terminal == 0
+    if g:mx_terminal_buffer_number == 0
         " Terminal init finished.
-        let g:mx_has_terminal = 1
         execute 'rightbelow terminal ++rows=' . g:mx_terminal_custom_height
     else
-        exec 'rightbelow ' . g:mx_terminal_custom_height . ' split'
-        exec 'b ' . g:mx_terminal_buffer_number
+        if bufexists(g:mx_terminal_buffer_number)
+            exec 'rightbelow ' . g:mx_terminal_custom_height . ' split'
+            exec 'b ' . g:mx_terminal_buffer_number
+        else
+            let g:mx_terminal_buffer_number = 0
+            call MXTerminalOpen()
+        endif
     endif
     call MXSetDefaultConfig()
 endfunction

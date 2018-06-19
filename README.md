@@ -2,7 +2,9 @@
 Use terminal easily in vim.(only support 8.1)
 
 ## Feature
-Quickly open and close terminal with `:MXTerminalToggle`
+* Quickly open and close terminal with `:MXTerminalToggle`.
+* Use `g:mx_terminal_custom_height` to config terminal height.
+
 
 ## Install
 * [vim-plug](https://github.com/junegunn/vim-plug)
