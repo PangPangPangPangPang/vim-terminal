@@ -9,6 +9,7 @@ let g:mx_called_toggle = 0
 let g:mx_is_terminal_open = 0
 
 let g:mx_terminal_default_height = 10
+let g:mx_terminal_custom_height = 0
 
 function! MXTerminalToggle()
     if g:mx_is_terminal_open == 1
@@ -32,12 +33,13 @@ endfunction
 
 function! MXTerminalOpen()
     let g:mx_called_toggle = 1
+    let terminal_height = g:mx_terminal_custom_height > 0 ? g:mx_terminal_custom_height : g:mx_terminal_default_height
     if g:mx_has_terminal == 0
         " Terminal init finished.
         let g:mx_has_terminal = 1
-        execute 'rightbelow terminal ++rows=' . g:mx_terminal_default_height
+        execute 'rightbelow terminal ++rows=' . terminal_height
     else
-        exec 'rightbelow ' . g:mx_terminal_default_height . ' split'
+        exec 'rightbelow ' . terminal_height . ' split'
         exec 'b ' . g:mx_terminal_buffer_number
     endif
     call MXSetDefaultConfig()
