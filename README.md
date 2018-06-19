@@ -1,6 +1,8 @@
 # vim-terminal
 Use terminal easily in vim.(only support 8.1)
 
+![example](img/example.gif?raw=true)
+
 ## Feature
 * Quickly open and close terminal with `:MXTerminalToggle`.
 * Use `g:mx_terminal_custom_height` to config terminal height.
