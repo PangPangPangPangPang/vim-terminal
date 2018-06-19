@@ -1,5 +1,5 @@
 if exists('g:mx_terminal_loaded')
-  " finish
+  finish
 end
 let g:mx_terminal_loaded = 1
 
