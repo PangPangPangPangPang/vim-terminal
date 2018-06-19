@@ -8,8 +8,9 @@ Use terminal easily in vim.(only support 8.1)
 
 
 ## Install
+`vim-terminal` should work with any modern plugin managers for Vim.
 * [vim-plug](https://github.com/junegunn/vim-plug)
-  * `Plug 'PangPangPangPangPang-terminal'`
+  * `Plug 'PangPangPangPangPang/vim-terminal'`
   
 ## Usage
 Below are some helper lines in my `.vimrc`
