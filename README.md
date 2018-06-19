@@ -23,4 +23,4 @@ tmap <F12> <c-w>:MXTerminalToggle<cr>
 ```
 
 ## Lisence
-MIT License. Copyright (c) 2013-2017 Bailey Ling & Contributors.
+MIT License. Copyright (c) 2018 Max Wang.
