@@ -6,6 +6,10 @@ let g:mx_terminal_loaded = 1
 let g:mx_terminal_buffer_number = 0
 let g:mx_is_terminal_open = 0
 
+if !exists("g:mx_terminal_custom_pos")
+  let g:mx_terminal_custom_pos = 'bottom'
+endif
+
 if !exists("g:mx_terminal_custom_height")
   let g:mx_terminal_custom_height = 10
 endif
@@ -36,12 +40,13 @@ function! MXTerminalClose()
 endfunction
 
 function! MXTerminalOpen()
+    let l:mx_terminal_pos = g:mx_terminal_custom_pos ==# 'bottom' ? 'botright ' : 'topleft '
     if g:mx_terminal_buffer_number == 0
         " Terminal init finished.
-        execute 'rightbelow terminal ++rows=' . g:mx_terminal_custom_height
+        execute l:mx_terminal_pos . 'terminal ++rows=' . g:mx_terminal_custom_height
     else
         if bufexists(g:mx_terminal_buffer_number)
-            exec 'rightbelow ' . g:mx_terminal_custom_height . ' split'
+            exec l:mx_terminal_pos . g:mx_terminal_custom_height . ' split'
             exec 'b ' . g:mx_terminal_buffer_number
         else
             let g:mx_terminal_buffer_number = 0
