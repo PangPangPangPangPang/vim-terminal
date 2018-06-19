@@ -44,7 +44,7 @@ function! MXTerminalOpen()
 endfunction
 
 function! MXSetDefaultConfig()
-    exec 'set sfh'
+    exec 'set wfh'
 endfunction
 
 
