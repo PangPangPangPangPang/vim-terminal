@@ -1,5 +1,5 @@
 if exists('g:vs_terminal_loaded')
-  " finish
+  finish
 end
 let g:vs_terminal_loaded = 1
 
@@ -8,6 +8,7 @@ let g:vs_is_terminal_open = 0
 
 let g:vs_called_by_toggle = 0
 let g:vs_terminal_map = {}
+let g:vs_lazyload_cmd = 0
 
 
 if !exists("g:vs_terminal_custom_pos")
@@ -18,7 +19,19 @@ if !exists("g:vs_terminal_custom_height")
   let g:vs_terminal_custom_height = 10
 endif
 
+function! VSLazyLoadCMD()
+    if g:vs_lazyload_cmd == 0
+        augroup VS
+            au TerminalOpen * if &buftype == 'terminal' | call VSTerminalSetDefault() | endif
+            au BufDelete * if &buftype == 'terminal' | call VSTerminalDelete() | endif
+            au BufWinEnter,BufEnter * if &buftype == 'terminal' | call VSTerminalRenderStatusline() | endif
+        augroup END
+        let g:vs_lazyload_cmd = 1
+endif
+endfunction
+
 function! VSTerminalToggle()
+    call VSLazyLoadCMD()
     if g:vs_is_terminal_open == 1
         call VSTerminalCloseWin()
         let g:vs_is_terminal_open = 0
@@ -46,10 +59,19 @@ function! VSTerminalOpenNew()
 endfunction
 
 function! VSTerminalOpenWithIndex(i)
-    call VSTerminalJudgeAndOpenWin()
+    call VSLazyLoadCMD()
     let l:keys = keys(g:vs_terminal_map)
     let l:index = a:i - 1
+    if (a:i > len(g:vs_terminal_map))
+        echoe 'Terminal not exists!'
+        return
+    endif
     let l:bufnr = keys[l:index]
+    if !bufexists(str2nr(l:bufnr))
+        echoe 'Terminal not exists!'
+        return
+    endif
+    call VSTerminalJudgeAndOpenWin()
     exec 'b ' . l:bufnr
     let g:vs_terminal_current_number = l:bufnr
     call VSTerminalRenderStatusline()
@@ -180,11 +202,6 @@ function! VSTerminalRenderStatusline()
     hi StatuslineTermNC ctermbg=236 ctermfg=236
 endfunction
 
-augroup vs
-    au TerminalOpen * if &buftype == 'terminal' | call VSTerminalSetDefault() | endif
-    au BufDelete * if &buftype == 'terminal' | call VSTerminalDelete() | endif
-    au BufWinEnter,BufEnter * if &buftype == 'terminal' | call VSTerminalRenderStatusline() | endif
-augroup END
 
 command! -nargs=0 -bar VSTerminalToggle :call VSTerminalToggle()
 command! -nargs=1 -bar VSTerminalOpenWithIndex :call VSTerminalOpenWithIndex('<args>')
