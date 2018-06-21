@@ -1,12 +1,21 @@
 # vim-terminal
 Use terminal easily in vim.(only support 8.1)
 
-![example](img/example.gif?raw=true)
+### Toggle
+![toggle](img/example.gif?raw=true)
+
+### Add tab
+![add](img/tab.gif?raw=true)
+
+### Switch tab
+![change](img/change_tab.gif?raw=true)
 
 ## Feature
-* Quickly open and close terminal with `:MXTerminalToggle`.
-* Use `g:mx_terminal_custom_height` to config terminal height.
-* Use `g:mx_terminal_custom_pos` to config terminal position.('top' or 'bottom')
+* Quickly open and close terminal with `:VSTerminalToggle`.
+* Tab management with `:VSTerminalOpenNew`, `:VSTerminalOpenWithIndex`, `:VSTerminalDeleteWithIndex`.
+* Use `g:vs_terminal_custom_height` to config terminal height.
+* Use `g:vs_terminal_custom_pos` to config terminal position.('top' or 'bottom')
+* Use `g:vs_terminal_custom_command` to config default command.(like `/bin/sh`)
 
 
 ## Install
@@ -20,8 +29,9 @@ Below are some helper lines in my `.vimrc`
 ```vim
 " Quick toggle terminal.
 Plug 'PangPangPangPangPang/vim-terminal'
-map <F12> :MXTerminalToggle<cr>
-tmap <F12> <c-w>:MXTerminalToggle<cr>
+" Plug 'PangPangPangPangPang/vim-terminal', { 'branch' : 'dev' }
+map <silent> <F12> :VSTerminalToggle<cr>
+tmap <silent> <F12> <c-w>:VSTerminalToggle<cr>
 ```
 
 ## Lisence
