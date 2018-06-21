@@ -2,7 +2,7 @@
 Use terminal easily in vim.(only support 8.1)
 
 ### Toggle
-![toggle](img/example.gif?raw=true)
+![toggle](img/toggle.gif?raw=true)
 
 ### Add tab
 ![add](img/tab.gif?raw=true)
