@@ -17,6 +17,7 @@ endif
 let g:vs_terminal_loaded = 1
 
 let g:vs_terminal_current_number = 0
+let g:vs_terminal_delete_bufer_number = 0
 let g:vs_is_terminal_open = 0
 
 let g:vs_called_by_toggle = 0
@@ -27,11 +28,9 @@ function! VSTerminalToggle()
     call VSLazyLoadCMD()
     if g:vs_is_terminal_open == 1
         call VSTerminalCloseWin()
-        let g:vs_is_terminal_open = 0
     else
         call  VSTerminalOpenWin()
-        call VSTerminalOpen()
-        let g:vs_is_terminal_open = 1
+        call VSTerminalOpenBuffer()
     endif
 endfunction
 
@@ -46,6 +45,7 @@ function! VSTerminalJudgeAndOpenWin()
 endfunction
 
 function! VSTerminalOpenNew()
+    call VSLazyLoadCMD()
     call VSTerminalJudgeAndOpenWin()
     call VSTerminalCreateNew()
 endfunction
@@ -58,7 +58,7 @@ function! VSTerminalOpenWithIndex(i)
         echoe 'Terminal not exists!'
         return
     endif
-    let l:bufnr = keys[l:index]
+    let l:bufnr = l:keys[l:index]
     if !bufexists(str2nr(l:bufnr))
         echoe 'Terminal not exists!'
         return
@@ -66,7 +66,25 @@ function! VSTerminalOpenWithIndex(i)
     call VSTerminalJudgeAndOpenWin()
     exec 'b ' . l:bufnr
     let g:vs_terminal_current_number = l:bufnr
-    call VSTerminalRenderStatusline()
+    call VSTerminalRenderStatuslineEvent()
+endfunction
+
+function! VSTerminalDeleteWithIndex(i)
+    let l:keys = keys(g:vs_terminal_map)
+    let l:index = a:i - 1
+    if (a:i > len(g:vs_terminal_map))
+        echoe 'Terminal not exists!'
+        return
+    endif
+    let l:bufnr = l:keys[l:index]
+    if !bufexists(str2nr(l:bufnr))
+        echoe 'Terminal not exists!'
+        return
+    endif
+    let g:vs_terminal_delete_bufer_number = l:bufnr
+    call VSGetCurrentNumberAfterDelete(l:bufnr)
+    call VSTerminalRenderStatuslineEvent()
+    exec 'bd! ' . l:bufnr
 endfunction
 
 function! VSTerminalCloseWin()
@@ -77,21 +95,23 @@ function! VSTerminalCloseWin()
         exec bufwinnr(str2nr(g:vs_terminal_current_number)) . 'wincmd w'
     endif
     close
+    let g:vs_is_terminal_open = 0
 endfunction
 
 function! VSTerminalCreateNew()
     " Terminal init finished.
     let g:vs_called_by_toggle = 1
-    execute 'terminal ++curwin ' . g:vs_terminal_custom_command
+    exec 'terminal ++curwin ' . g:vs_terminal_custom_command
 endfunction
 
 function! VSTerminalOpenWin()
     let l:vs_terminal_pos = g:vs_terminal_custom_pos ==# 'bottom' ? 'botright ' : 'topleft '
     exec l:vs_terminal_pos . g:vs_terminal_custom_height . ' split'
+    let g:vs_is_terminal_open = 1
 endfunction
 
-function! VSTerminalOpen()
-    if g:vs_terminal_current_number == 0
+function! VSTerminalOpenBuffer()
+    if g:vs_terminal_current_number == 0 
         call VSTerminalCreateNew()
     else
         if bufexists(str2nr(g:vs_terminal_current_number))
@@ -116,7 +136,7 @@ function! VSTerminalSetDefautlBufferNumber()
     let g:vs_terminal_current_number = l:buffer_number
 endfunction
 
-function! VSTerminalSetDefault()
+function! VSTerminalOpenEvent()
     if g:vs_called_by_toggle == 1
         " Mark the first terminal as default.
         call VSTerminalSetDefautlBufferNumber()
@@ -124,25 +144,40 @@ function! VSTerminalSetDefault()
         let l:buffer_number = winbufnr(l:window_number)
         let g:vs_terminal_map[l:buffer_number] = 0
         let g:vs_called_by_toggle = 0
-        call VSTerminalRenderStatusline()
+        call VSTerminalRenderStatuslineEvent()
     endif
 endfunction
 
-function! VSTerminalDelete()
-    let g:vs_is_terminal_open = 0
-    let l:window_number = winnr()
-    let l:buffer_number = winbufnr(l:window_number)
-    if has_key(g:vs_terminal_map, l:buffer_number)
-        call remove(g:vs_terminal_map, l:buffer_number)
-        if l:buffer_number == g:vs_terminal_current_number
+function! VSTerminalDeleteEvent()
+    let l:buffer_number = 0
+    if g:vs_terminal_delete_bufer_number
+        let l:buffer_number = g:vs_terminal_delete_bufer_number
+    else
+        let l:window_number = winnr()
+        let l:buffer_number = winbufnr(l:window_number)
+    endif
+
+    call VSGetCurrentNumberAfterDelete(l:buffer_number)
+    call VSTerminalRenderStatuslineEvent()
+    let g:vs_terminal_delete_bufer_number = 0
+
+endfunction
+
+function! VSGetCurrentNumberAfterDelete(n)
+    if has_key(g:vs_terminal_map, a:n)
+        call remove(g:vs_terminal_map, a:n)
+        if a:n == g:vs_terminal_current_number
             let g:vs_terminal_current_number = len(g:vs_terminal_map) > 0 ? keys(g:vs_terminal_map)[0] : 0
         endif
     endif
 
+    if len(g:vs_terminal_map) == 0
+        let g:vs_is_terminal_open = 0
+    endif
 endfunction
 
 
-function! VSTerminalRenderStatusline()
+function! VSTerminalRenderStatuslineEvent()
     set statusline=
     let l:count = len(g:vs_terminal_map)
     let l:keys = keys(g:vs_terminal_map)
@@ -196,14 +231,16 @@ endfunction
 
 
 command! -nargs=0 -bar VSTerminalToggle :call VSTerminalToggle()
+command! -nargs=0 -bar VSTerminalOpenNew :call VSTerminalOpenNew()
 command! -nargs=1 -bar VSTerminalOpenWithIndex :call VSTerminalOpenWithIndex('<args>')
+command! -nargs=1 -bar VSTerminalDeleteWithIndex :call VSTerminalDeleteWithIndex('<args>')
 
 function! VSLazyLoadCMD()
     if g:vs_lazyload_cmd == 0
         augroup VS
-            au TerminalOpen * if &buftype == 'terminal' | call VSTerminalSetDefault() | endif
-            au BufDelete * if &buftype == 'terminal' | call VSTerminalDelete() | endif
-            au BufWinEnter,BufEnter * if &buftype == 'terminal' | call VSTerminalRenderStatusline() | endif
+            au TerminalOpen * if &buftype == 'terminal' | call VSTerminalOpenEvent() | endif
+            au BufDelete * if &buftype == 'terminal' | call VSTerminalDeleteEvent() | endif
+            au BufWinEnter,BufEnter * if &buftype == 'terminal' | call VSTerminalRenderStatuslineEvent() | endif
         augroup END
         let g:vs_lazyload_cmd = 1
 
