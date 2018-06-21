@@ -23,17 +23,6 @@ let g:vs_called_by_toggle = 0
 let g:vs_terminal_map = {}
 let g:vs_lazyload_cmd = 0
 
-function! VSLazyLoadCMD()
-    if g:vs_lazyload_cmd == 0
-        augroup VS
-            au TerminalOpen * if &buftype == 'terminal' | call VSTerminalSetDefault() | endif
-            au BufDelete * if &buftype == 'terminal' | call VSTerminalDelete() | endif
-            au BufWinEnter,BufEnter * if &buftype == 'terminal' | call VSTerminalRenderStatusline() | endif
-        augroup END
-        let g:vs_lazyload_cmd = 1
-endif
-endfunction
-
 function! VSTerminalToggle()
     call VSLazyLoadCMD()
     if g:vs_is_terminal_open == 1
@@ -209,14 +198,27 @@ endfunction
 command! -nargs=0 -bar VSTerminalToggle :call VSTerminalToggle()
 command! -nargs=1 -bar VSTerminalOpenWithIndex :call VSTerminalOpenWithIndex('<args>')
 
+function! VSLazyLoadCMD()
+    if g:vs_lazyload_cmd == 0
+        augroup VS
+            au TerminalOpen * if &buftype == 'terminal' | call VSTerminalSetDefault() | endif
+            au BufDelete * if &buftype == 'terminal' | call VSTerminalDelete() | endif
+            au BufWinEnter,BufEnter * if &buftype == 'terminal' | call VSTerminalRenderStatusline() | endif
+        augroup END
+        let g:vs_lazyload_cmd = 1
+
+        """"""""""""""""""""""""""" Compatible with old verion.""""""""""""""""""""""""""""
+        if exists("g:mx_terminal_custom_pos")
+            let g:vs_terminal_custom_pos = g:mx_terminal_custom_pos
+        endif
+
+        if exists("g:mx_terminal_custom_height")
+            let g:vs_terminal_custom_height = g:mx_terminal_custom_height
+        endif
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    endif
+endfunction
 
 """"""""""""""""""""""""""" Compatible with old verion.""""""""""""""""""""""""""""
 command! -nargs=0 -bar MXTerminalToggle :call VSTerminalToggle()
-if !exists("g:mx_terminal_custom_pos")
-  let g:vs_terminal_custom_pos = 'bottom'
-endif
-
-if !exists("g:mx_terminal_custom_height")
-  let g:vs_terminal_custom_height = 10
-endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
