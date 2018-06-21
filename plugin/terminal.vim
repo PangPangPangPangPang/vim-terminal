@@ -1,6 +1,19 @@
 if exists('g:vs_terminal_loaded')
   finish
 end
+
+if !exists('g:vs_terminal_custom_pos')
+  let g:vs_terminal_custom_pos = 'bottom'
+endif
+
+if !exists('g:vs_terminal_custom_height')
+  let g:vs_terminal_custom_height = 10
+endif
+
+if !exists('g:vs_terminal_custom_command')
+    let g:vs_terminal_custom_command = ''
+endif
+
 let g:vs_terminal_loaded = 1
 
 let g:vs_terminal_current_number = 0
@@ -9,15 +22,6 @@ let g:vs_is_terminal_open = 0
 let g:vs_called_by_toggle = 0
 let g:vs_terminal_map = {}
 let g:vs_lazyload_cmd = 0
-
-
-if !exists("g:vs_terminal_custom_pos")
-  let g:vs_terminal_custom_pos = 'bottom'
-endif
-
-if !exists("g:vs_terminal_custom_height")
-  let g:vs_terminal_custom_height = 10
-endif
 
 function! VSLazyLoadCMD()
     if g:vs_lazyload_cmd == 0
@@ -36,7 +40,6 @@ function! VSTerminalToggle()
         call VSTerminalCloseWin()
         let g:vs_is_terminal_open = 0
     else
-        " call VSTerminalOpen()
         call  VSTerminalOpenWin()
         call VSTerminalOpen()
         let g:vs_is_terminal_open = 1
@@ -90,7 +93,7 @@ endfunction
 function! VSTerminalCreateNew()
     " Terminal init finished.
     let g:vs_called_by_toggle = 1
-    execute 'terminal ++curwin'
+    execute 'terminal ++curwin ' . g:vs_terminal_custom_command
 endfunction
 
 function! VSTerminalOpenWin()
