@@ -1,5 +1,5 @@
 # vim-terminal
-Use terminal easily in vim.(only support 8.1)
+Use terminal easily in vim/neovim.(only support 8.1)
 
 ### Toggle
 ![toggle](img/example.gif?raw=true)
@@ -28,10 +28,15 @@ Below are some helper lines in my `.vimrc`
 
 ```vim
 " Quick toggle terminal.
-Plug 'PangPangPangPangPang/vim-terminal'
-" Plug 'PangPangPangPangPang/vim-terminal', { 'branch' : 'dev' }
+Plug 'PangPangPangPangPang/vim-terminal', { 'branch' : 'dev' }
 map <silent> <F12> :VSTerminalToggle<cr>
-tmap <silent> <F12> <c-w>:VSTerminalToggle<cr>
+if has('nvim')
+    tnoremap <F12> <C-\><C-n> :VSTerminalToggle<cr>
+    tnoremap <C-w> <C-\><C-n><C-w>
+else
+    tmap <silent> <F12> <c-w>:VSTerminalToggle<cr>
+endif
+let g:vs_terminal_custom_height = 10
 ```
 
 ## Lisence
