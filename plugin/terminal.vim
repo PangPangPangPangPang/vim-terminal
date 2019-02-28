@@ -67,6 +67,7 @@ function! VSTerminalOpenWithIndex(i)
     exec 'b ' . l:bufnr
     let g:vs_terminal_current_number = l:bufnr
     call VSTerminalRenderStatuslineEvent()
+
 endfunction
 
 function! VSTerminalDeleteWithIndex(i)
@@ -101,7 +102,11 @@ endfunction
 function! VSTerminalCreateNew()
     " Terminal init finished.
     let g:vs_called_by_toggle = 1
-    exec 'terminal ++curwin ' . g:vs_terminal_custom_command
+    if has('nvim')
+        exec "call termopen(\'zsh\')"
+    else
+        exec 'terminal ++curwin ' . g:vs_terminal_custom_command
+    endif
 endfunction
 
 function! VSTerminalOpenWin()
@@ -109,6 +114,9 @@ function! VSTerminalOpenWin()
     let l:vs_terminal_pos = g:vs_terminal_custom_pos ==# 'left' ? 'topleft ' : g:vs_terminal_custom_pos ==# 'right' ? 'botright ' : l:vs_terminal_pos
     let l:vs_terminal_split = g:vs_terminal_custom_pos ==# 'left' ? ' vsplit' : g:vs_terminal_custom_pos ==# 'right' ? ' vsplit' : ' split'
     exec l:vs_terminal_pos . g:vs_terminal_custom_height . l:vs_terminal_split
+    if has('nvim')
+        exec 'enew'
+    endif
     let g:vs_is_terminal_open = 1
 endfunction
 
@@ -147,6 +155,9 @@ function! VSTerminalOpenEvent()
         let g:vs_terminal_map[l:buffer_number] = 0
         let g:vs_called_by_toggle = 0
         call VSTerminalRenderStatuslineEvent()
+    endif
+    if has('nvim')
+        exec 'normal! a'
     endif
 endfunction
 
@@ -231,6 +242,12 @@ function! VSTerminalRenderStatuslineEvent()
     hi StatuslineTermNC ctermbg=236 ctermfg=236
 endfunction
 
+function! VSTerminalBufEnterEvent()
+    if has('nvim')
+        exec 'normal! a'
+    endif
+endfunction
+
 
 command! -nargs=0 -bar VSTerminalToggle :call VSTerminalToggle()
 command! -nargs=0 -bar VSTerminalOpenNew :call VSTerminalOpenNew()
@@ -240,9 +257,14 @@ command! -nargs=1 -bar VSTerminalDeleteWithIndex :call VSTerminalDeleteWithIndex
 function! VSLazyLoadCMD()
     if g:vs_lazyload_cmd == 0
         augroup VS
-            au TerminalOpen * if &buftype == 'terminal' | call VSTerminalOpenEvent() | endif
+            if has('nvim')
+                au TermOpen * if &buftype == 'terminal' | call VSTerminalOpenEvent() | endif
+            else
+                au TerminalOpen * if &buftype == 'terminal' | call VSTerminalOpenEvent() | endif
+            endif
             au BufDelete * if &buftype == 'terminal' | call VSTerminalDeleteEvent() | endif
             au BufWinEnter,BufEnter * if &buftype == 'terminal' | call VSTerminalRenderStatuslineEvent() | endif
+            au BufWinEnter * if &buftype == 'terminal' | call VSTerminalBufEnterEvent() | endif
         augroup END
         let g:vs_lazyload_cmd = 1
 
