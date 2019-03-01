@@ -103,6 +103,7 @@ function! VSTerminalCreateNew()
     " Terminal init finished.
     let g:vs_called_by_toggle = 1
     if has('nvim')
+        exec 'enew'
         exec "call termopen(\'zsh\')"
     else
         exec 'terminal ++curwin ' . g:vs_terminal_custom_command
@@ -114,9 +115,6 @@ function! VSTerminalOpenWin()
     let l:vs_terminal_pos = g:vs_terminal_custom_pos ==# 'left' ? 'topleft ' : g:vs_terminal_custom_pos ==# 'right' ? 'botright ' : l:vs_terminal_pos
     let l:vs_terminal_split = g:vs_terminal_custom_pos ==# 'left' ? ' vsplit' : g:vs_terminal_custom_pos ==# 'right' ? ' vsplit' : ' split'
     exec l:vs_terminal_pos . g:vs_terminal_custom_height . l:vs_terminal_split
-    if has('nvim')
-        exec 'enew'
-    endif
     let g:vs_is_terminal_open = 1
 endfunction
 
