@@ -24,6 +24,8 @@ let g:vs_called_by_toggle = 0
 let g:vs_terminal_map = {}
 let g:vs_lazyload_cmd = 0
 
+let g:vs_prev_buffer = 0
+
 function! VSTerminalToggle()
     call VSLazyLoadCMD()
     if g:vs_is_terminal_open == 1
@@ -89,13 +91,16 @@ function! VSTerminalDeleteWithIndex(i)
 endfunction
 
 function! VSTerminalCloseWin()
-    if winnr() == bufwinnr(str2nr(g:vs_terminal_current_number))
+    if len(win_findbuf(g:vs_terminal_current_number)) > 0 
+                \ && win_getid() == win_findbuf(g:vs_terminal_current_number)[0]
         exec 'wincmd p'
-        exec bufwinnr(str2nr(g:vs_terminal_current_number)) . 'wincmd w'
     else
-        exec bufwinnr(str2nr(g:vs_terminal_current_number)) . 'wincmd w'
+        let g:vs_prev_buffer = win_getid()
     endif
+
+    exec bufwinnr(str2nr(g:vs_terminal_current_number)) . 'wincmd w'
     close
+    call win_gotoid(g:vs_prev_buffer)
     let g:vs_is_terminal_open = 0
 endfunction
 
@@ -241,6 +246,7 @@ function! VSTerminalRenderStatuslineEvent()
 endfunction
 
 function! VSTerminalBufEnterEvent()
+    let g:vs_prev_buffer = win_getid(winnr("#"))
     if has('nvim')
         exec 'normal! a'
     endif
