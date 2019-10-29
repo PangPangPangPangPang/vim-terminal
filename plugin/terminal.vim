@@ -15,6 +15,7 @@ if !exists('g:vs_terminal_custom_command')
 endif
 
 let g:vs_terminal_loaded = 1
+let g:vs_terminal_separator = ""
 
 let g:vs_terminal_current_number = 0
 let g:vs_terminal_delete_bufer_number = 0
@@ -192,6 +193,9 @@ function! VSGetCurrentNumberAfterDelete(n)
     endif
 endfunction
 
+function! VSTermianlGetSeparator()
+    return g:vs_terminal_separator
+endfunction
 
 function! VSTerminalRenderStatuslineEvent()
     set statusline=
@@ -239,10 +243,9 @@ function! VSTerminalRenderStatuslineEvent()
             set statusline +=%2*\ 6\ %*
         endif
     endif
-    hi User1 cterm=bold ctermfg=169 ctermbg=238
-    hi User2 cterm=none ctermfg=238 ctermbg=169
-    hi StatuslineTerm ctermbg=236 ctermfg=236
-    hi StatuslineTermNC ctermbg=236 ctermfg=236
+    highlight User1 gui=bold term=bold guibg=#F00056 guifg=#3D3B4F ctermbg=Red ctermfg=Black
+    highlight User2 gui=bold term=bold guibg=#3D3B4F guifg=#F00056 ctermbg=Black ctermfg=Red
+    highlight Statusline guibg=#3D3B4F guifg=#3D3B4F ctermbg=Black ctermfg=Black
 endfunction
 
 function! VSTerminalBufEnterEvent()
