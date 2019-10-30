@@ -15,7 +15,7 @@ if !exists('g:vs_terminal_custom_command')
 endif
 
 let g:vs_terminal_loaded = 1
-let g:vs_terminal_separator = ""
+let g:vs_terminal_separator = "a"
 
 let g:vs_terminal_current_number = 0
 let g:vs_terminal_delete_bufer_number = 0
@@ -201,48 +201,16 @@ function! VSTerminalRenderStatuslineEvent()
     set statusline=
     let l:count = len(g:vs_terminal_map)
     let l:keys = keys(g:vs_terminal_map)
-    if l:count > 0
-        if l:keys[0] == g:vs_terminal_current_number
-            set statusline +=%1*\ 1\ %*
-        else
-            set statusline +=%2*\ 1\ %*
+    let l:index = 0
+    while l:index < l:count
+        let l:color = 2
+        if l:keys[l:index] == g:vs_terminal_current_number
+            let l:color = 1
         endif
-    endif
-    if l:count > 1
-        if l:keys[1] == g:vs_terminal_current_number
-            set statusline +=%1*\ 2\ %*
-        else
-            set statusline +=%2*\ 2\ %*
-        endif
-    endif
-    if l:count > 2
-        if l:keys[2] == g:vs_terminal_current_number
-            set statusline +=%1*\ 3\ %*
-        else
-            set statusline +=%2*\ 3\ %*
-        endif
-    endif
-    if l:count > 3
-        if l:keys[3] == g:vs_terminal_current_number
-            set statusline +=%1*\ 4\ %*
-        else
-            set statusline +=%2*\ 4\ %*
-        endif
-    endif
-    if l:count > 4
-        if l:keys[4] == g:vs_terminal_current_number
-            set statusline +=%1*\ 5\ %*
-        else
-            set statusline +=%2*\ 5\ %*
-        endif
-    endif
-    if l:count > 5
-        if l:keys[5] == g:vs_terminal_current_number
-            set statusline +=%1*\ 6\ %*
-        else
-            set statusline +=%2*\ 6\ %*
-        endif
-    endif
+        let l:index = l:index + 1
+        let l:number = l:index
+        exec 'set statusline +=%' . l:color . '*\ ' . l:number . '\ %*'
+    endwhile
     highlight User1 gui=bold term=bold guibg=#F00056 guifg=#3D3B4F ctermbg=Red ctermfg=Black
     highlight User2 gui=bold term=bold guibg=#3D3B4F guifg=#F00056 ctermbg=Black ctermfg=Red
     highlight Statusline guibg=#3D3B4F guifg=#3D3B4F ctermbg=Black ctermfg=Black
