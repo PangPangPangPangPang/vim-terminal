@@ -15,7 +15,9 @@ if !exists('g:vs_terminal_custom_command')
 endif
 
 let g:vs_terminal_loaded = 1
-let g:vs_terminal_separator = "a"
+if !exists('g:vs_terminal_separator') 
+    let g:vs_terminal_separator = ""
+endif
 
 let g:vs_terminal_current_number = 0
 let g:vs_terminal_delete_bufer_number = 0
@@ -193,10 +195,6 @@ function! VSGetCurrentNumberAfterDelete(n)
     endif
 endfunction
 
-function! VSTermianlGetSeparator()
-    return g:vs_terminal_separator
-endfunction
-
 function! VSTerminalRenderStatuslineEvent()
     set statusline=
     let l:count = len(g:vs_terminal_map)
@@ -207,13 +205,29 @@ function! VSTerminalRenderStatuslineEvent()
         if l:keys[l:index] == g:vs_terminal_current_number
             let l:color = 1
         endif
-        let l:index = l:index + 1
-        let l:number = l:index
+        let l:number = l:index + 1
         exec 'set statusline +=%' . l:color . '*\ ' . l:number . '\ %*'
+
+        if len(g:vs_terminal_separator) > 0
+            let l:separator_color = 3
+            if l:keys[l:index] == g:vs_terminal_current_number
+                let l:separator_color = 3
+            else 
+                let l:separator_color = 4
+            endif
+            exec 'set statusline +=%' . l:separator_color . '*\' . g:vs_terminal_separator . '\ %*'
+        endif
+        let l:index = l:index + 1
     endwhile
-    highlight User1 gui=bold term=bold guibg=#F00056 guifg=#3D3B4F ctermbg=Red ctermfg=Black
+    " Highlight
+    highlight User1 gui=bold term=bold guibg=#F00056 guifg=#3D3B4F ctermbg=Red ctermfg=Black 
+    " Normal
     highlight User2 gui=bold term=bold guibg=#3D3B4F guifg=#F00056 ctermbg=Black ctermfg=Red
-    highlight Statusline guibg=#3D3B4F guifg=#3D3B4F ctermbg=Black ctermfg=Black
+    " Separator highlight
+    highlight User3 gui=bold term=bold guibg=#161823 guifg=#F00056 ctermbg=Black ctermfg=Red
+    " Separator normal
+    highlight User4 gui=bold term=bold guibg=#161823 guifg=#3D3B4F ctermbg=Black ctermfg=Red
+    highlight Statusline guibg=#F2ECDE guifg=#161823 ctermbg=white ctermfg=white
 endfunction
 
 function! VSTerminalBufEnterEvent()
